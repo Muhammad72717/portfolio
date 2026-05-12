@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muhammad Murtaza | Cinematic Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Orbitron:wght@400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+:root {
+  --c1:#00f5ff; --c2:#7b2fff; --c4:#00ff88; --bg:#020408; --bg2:#040b14;
+  --text:#e8edf5; --muted:#6b7a99; --glass:rgba(255,255,255,0.04);
+}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; cursor: none; }
+body { 
+    background: var(--bg); color: var(--text); font-family: 'Space Grotesk', sans-serif; 
+    overflow-x: hidden; scroll-behavior: smooth;
+}
+
+/* --- REFINED CUSTOM CURSOR --- */
+#cursor {
+  position: fixed; width: 8px; height: 8px; background: var(--c1);
+  border-radius: 50%; pointer-events: none; z-index: 10000; mix-blend-mode: difference;
+}
+#cursor-follower {
+  position: fixed; width: 35px; height: 35px; border: 1px solid rgba(0,245,255,0.5);
+  border-radius: 50%; pointer-events: none; z-index: 9999; transition: transform 0.1s ease-out;
+}
+
+/* NAVIGATION */
+nav {
+    position: fixed; top: 0; width: 100%; padding: 1.2rem 5%;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(2,4,8,0.8); backdrop-filter: blur(15px); z-index: 1000;
+    border-bottom: 1px solid rgba(0,245,255,0.1);
+}
+.logo { font-family: 'Orbitron'; color: var(--c1); font-weight: 900; font-size: 1rem; letter-spacing: 2px; }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: var(--muted); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
+.nav-links a:hover { color: var(--c1); }
+
+/* HERO SECTION */
+#hero { height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; position: relative; }
+#hero-canvas { position: absolute; top: 0; left: 0; z-index: -1; }
+.hero-content h1 { font-family: 'Orbitron'; font-size: clamp(2rem, 8vw, 4.5rem); line-height: 1.1; margin-bottom: 1.5rem; }
+.hero-content span { background: linear-gradient(135deg, #fff, var(--c1), var(--c2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-badge { display: inline-block; padding: 0.4rem 1rem; border: 1px solid var(--c1); border-radius: 20px; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--c1); margin-bottom: 1.5rem; }
+
+/* SECTIONS */
+section { padding: 100px 10%; position: relative; z-index: 10; }
+.section-tag { font-family: 'JetBrains Mono'; color: var(--c1); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 1rem; display: block; }
+.section-title { font-family: 'Orbitron'; font-size: 2.5rem; margin-bottom: 3rem; }
+.section-title span { color: var(--c1); }
+
+/* CARDS & GRIDS */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+.card { 
+    background: var(--glass); border: 1px solid rgba(255,255,255,0.08); 
+    padding: 2rem; border-radius: 4px; transition: 0.4s; position: relative;
+}
+.card:hover { border-color: var(--c1); transform: translateY(-5px); background: rgba(0,245,255,0.03); }
+
+/* TIMELINE / EXPERIENCE */
+.timeline { position: relative; border-left: 1px solid rgba(0,245,255,0.2); padding-left: 2rem; }
+.timeline-item { margin-bottom: 3.5rem; position: relative; }
+.timeline-item::before { 
+    content: ''; position: absolute; left: calc(-2rem - 6px); top: 5px; 
+    width: 10px; height: 10px; border-radius: 50%; background: var(--c1); box-shadow: 0 0 10px var(--c1); 
+}
+.timeline-date { font-family: 'JetBrains Mono'; color: var(--c1); font-size: 0.8rem; margin-bottom: 0.5rem; }
+.timeline-company { color: var(--c2); font-weight: bold; font-size: 0.9rem; margin-bottom: 0.5rem; }
+
+/* INNOVATION LAB */
+.lab-card { text-align: center; padding: 3rem 2rem; }
+.lab-icon { font-size: 2.5rem; margin-bottom: 1.5rem; display: block; }
+
+/* BUTTONS */
+.btn { 
+    background: transparent; border: 1px solid var(--c1); color: var(--c1); 
+    padding: 0.8rem 2.5rem; font-family: 'Orbitron'; font-size: 0.8rem; 
+    cursor: pointer; text-decoration: none; transition: 0.3s; display: inline-block;
+}
+.btn:hover { background: var(--c1); color: var(--bg); box-shadow: 0 0 20px rgba(0,245,255,0.4); }
+
+footer { padding: 3rem 10%; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; color: var(--muted); font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-follower"></div>
+
+<nav>
+  <div class="logo">M.MURTAZA</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Timeline</a></li>
+    <li><a href="#ailab">AI Lab</a></li>
+  </ul>
+  <a href="#contact" class="btn" style="padding: 0.5rem 1rem;">Contact</a>
+</nav>
+
+<canvas id="hero-canvas"></canvas>
+
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Available for AI & Full Stack Roles</div>
+    <h1>Building <span>Intelligent</span><br>Digital Experiences</h1>
+    <p style="color: var(--muted); max-width: 600px; margin: 1.5rem auto 2.5rem; line-height: 1.8;">
+        I craft high-performance web applications, AI-powered systems, and immersive digital experiences that push the boundaries of what's possible on the web.
+    </p>
+    <a href="#projects" class="btn">View My Work</a>
+  </div>
+</section>
+
+<section id="about">
+    <div class="grid" style="align-items: center;">
+        <div>
+            <span class="section-tag">Biography</span>
+            <h2 class="section-title">I Build Things That <span>Matter</span></h2>
+            <p style="line-height: 1.9; color: var(--muted); margin-bottom: 1.5rem;">
+                I'm a full-stack developer and AI engineer obsessed with creating systems that are fast, beautiful, and intelligent. With over 5 years of experience, I've shipped products used by thousands of people worldwide.
+            </p>
+            <p style="line-height: 1.9; color: var(--muted);">Currently focused on LLM integrations, RAG systems, and pushing the boundaries of real-time web technologies.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="card" style="text-align: center;">
+                <h2 style="color: var(--c1); font-family: 'Orbitron';">5yr</h2>
+                <p style="font-size: 0.7rem; text-transform: uppercase;">Experience</p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <h2 style="color: var(--c1); font-family: 'Orbitron';">50+</h2>
+                <p style="font-size: 0.7rem; text-transform: uppercase;">Projects</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="projects">
+  <span class="section-tag">Portfolio</span>
+  <h2 class="section-title">Featured <span>Projects</span></h2>
+  <div class="grid">
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">NeuralChat Platform</h3>
+      <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem;">AI-powered customer support platform with context-aware responses and multi-model routing.</p>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--c1);">NEXT.JS • OPENAI • REDIS</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Synapse Analytics</h3>
+      <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Real-time business intelligence platform processing millions of events with live dashboards.</p>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--c1);">REACT • WEBSOCKET • TIMESCALEDB</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">AutoFlow Engine</h3>
+      <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Visual workflow automation builder with AI-enhanced decision nodes and multi-service integrations.</p>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--c1);">NODE.JS • ANTHROPIC • K8S</div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+    <span class="section-tag">Career Journey</span>
+    <h2 class="section-title">Professional <span>Timeline</span></h2>
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-date">2023 — PRESENT</div>
+            <h3 class="timeline-title">Senior Full Stack & AI Engineer</h3>
+            <div class="timeline-company">Freelance / Independent</div>
+            <p style="color: var(--muted); font-size: 0.9rem;">Building AI-powered SaaS products and automation systems. Delivered 15+ production-grade projects.</p>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-date">2021 — 2023</div>
+            <h3 class="timeline-title">Lead Frontend Developer</h3>
+            <div class="timeline-company">TechVentures Inc.</div>
+            <p style="color: var(--muted); font-size: 0.9rem;">Led a team of 5 developers. Improved performance by 60% and migrated entire stack to Next.js 13.</p>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-date">2020 — 2021</div>
+            <h3 class="timeline-title">Full Stack Developer</h3>
+            <div class="timeline-company">Digital Agency Pro</div>
+            <p style="color: var(--muted); font-size: 0.9rem;">Developed custom web applications for enterprise clients. Specialized in React architecture.</p>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-date">2019 — 2020</div>
+            <h3 class="timeline-title">Junior Web Developer</h3>
+            <div class="timeline-company">StartupHub</div>
+            <p style="color: var(--muted); font-size: 0.9rem;">Started professional journey building responsive web apps and REST APIs.</p>
+        </div>
+    </div>
+</section>
+
+<section id="ailab" style="background: var(--bg2);">
+    <span class="section-tag">Innovation Lab</span>
+    <h2 class="section-title">AI <span>Engineering</span></h2>
+    <div class="grid">
+        <div class="card lab-card">
+            <span class="lab-icon">🧠</span>
+            <h3 style="color: var(--c1); margin-bottom: 1rem;">LLM & RAG</h3>
+            <p style="color: var(--muted); font-size: 0.85rem;">Building production-grade RAG systems with vector databases and custom knowledge bases.</p>
+        </div>
+        <div class="card lab-card">
+            <span class="lab-icon">⚡</span>
+            <h3 style="color: var(--c1); margin-bottom: 1rem;">Agentic Systems</h3>
+            <p style="color: var(--muted); font-size: 0.85rem;">Designing multi-agent orchestration for autonomous decision-making in complex workflows.</p>
+        </div>
+        <div class="card lab-card">
+            <span class="lab-icon">🌐</span>
+            <h3 style="color: var(--c1); margin-bottom: 1rem;">Real-time AI</h3>
+            <p style="color: var(--muted); font-size: 0.85rem;">Streaming AI interfaces using WebSockets and multimodal applications.</p>
+        </div>
+    </div>
+</section>
+
+<section id="contact">
+    <div class="card" style="text-align: center; padding: 4rem 2rem; border-color: var(--c1);">
+        <h2 class="section-title" style="margin-bottom: 1rem;">Let's <span>Connect</span></h2>
+        <p style="color: var(--muted); margin-bottom: 2.5rem;">Have a project in mind? Let's build something incredible together.</p>
+        <a href="mailto:hello@devportfolio.dev" class="btn">Send Message</a>
+    </div>
+</section>
+
+<footer>
+    <p>MUHAMMAD MURTAZA © 2024 • CRAFTED WITH PASSION & THREE.JS</p>
+</footer>
+
+<script>
+// --- CUSTOM CURSOR ---
+const cursor = document.getElementById('cursor');
+const follower = document.getElementById('cursor-follower');
+
+document.addEventListener('mousemove', (e) => {
+    gsap.to(cursor, {x: e.clientX, y: e.clientY, duration: 0});
+    gsap.to(follower, {x: e.clientX - 17, y: e.clientY - 17, duration: 0.3});
+});
+
+// --- HERO BACKGROUND ---
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('hero-canvas'), antialias: true, alpha: true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+const starsGeo = new THREE.BufferGeometry();
+const starsCount = 5000;
+const posArray = new Float32Array(starsCount * 3);
+for(let i=0; i<starsCount*3; i++) posArray[i] = (Math.random() - 0.5) * 150;
+starsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+const starMesh = new THREE.Points(starsGeo, new THREE.PointsMaterial({size: 0.05, color: 0x00f5ff, transparent: true, opacity: 0.8}));
+scene.add(starMesh);
+
+camera.position.z = 5;
+
+function animateHero() {
+    requestAnimationFrame(animateHero);
+    starMesh.rotation.y += 0.0006;
+    starMesh.rotation.x += 0.0002;
+    renderer.render(scene, camera);
+}
+animateHero();
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body>
+</html>
